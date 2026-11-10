@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Meu Kanban</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Organize seu trabalho</p>
+        <h1>Meu Kanban</h1>
+        <p class="subtitle">Acompanhe suas tarefas, uma etapa de cada vez.</p>
+      </div>
+      <button class="primary-button" id="add-task-button" type="button">
+        <span class="add-icon" aria-hidden="true">+</span>
+        Adicionar nova tarefa
+      </button>
+    </header>
+
+    <p class="storage-notice" id="storage-notice" role="status" hidden>
+      O armazenamento local está indisponível. Suas alterações não serão salvas após fechar a página.
+    </p>
+
+    <section class="board" id="board" aria-label="Quadro de tarefas">
+      <section class="kanban-column" data-status="todo" aria-labelledby="heading-todo">
+        <header class="column-header">
+          <h2 class="column-heading" id="heading-todo">
+            <span class="column-dot" aria-hidden="true"></span>
+            A Fazer
+          </h2>
+          <span class="task-count" data-count="todo" aria-label="0 tarefas">0</span>
+        </header>
+        <div class="task-list" data-list="todo"></div>
+        <p class="empty-state" data-empty="todo">Nenhuma tarefa por aqui.</p>
+      </section>
+
+      <section class="kanban-column" data-status="doing" aria-labelledby="heading-doing">
+        <header class="column-header">
+          <h2 class="column-heading" id="heading-doing">
+            <span class="column-dot" aria-hidden="true"></span>
+            Em Andamento
+          </h2>
+          <span class="task-count" data-count="doing" aria-label="0 tarefas">0</span>
+        </header>
+        <div class="task-list" data-list="doing"></div>
+        <p class="empty-state" data-empty="doing">Nenhuma tarefa por aqui.</p>
+      </section>
+
+      <section class="kanban-column" data-status="done" aria-labelledby="heading-done">
+        <header class="column-header">
+          <h2 class="column-heading" id="heading-done">
+            <span class="column-dot" aria-hidden="true"></span>
+            Concluído
+          </h2>
+          <span class="task-count" data-count="done" aria-label="0 tarefas">0</span>
+        </header>
+        <div class="task-list" data-list="done"></div>
+        <p class="empty-state" data-empty="done">Nenhuma tarefa por aqui.</p>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="task-dialog" aria-labelledby="dialog-title">
+    <form class="dialog-content" id="task-form">
+      <h2 id="dialog-title">Nova tarefa</h2>
+      <p class="dialog-help">Adicione uma tarefa para acompanhar no seu quadro.</p>
+
+      <div class="form-field">
+        <label for="task-title-input">Título <span aria-hidden="true">*</span></label>
+        <input
+          id="task-title-input"
+          name="title"
+          type="text"
+          maxlength="120"
+          placeholder="Ex.: Preparar apresentação"
+          autocomplete="off"
+          required
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="task-description-input">Descrição <span>(opcional)</span></label>
+        <textarea
+          id="task-description-input"
+          name="description"
+          maxlength="1000"
+          placeholder="Inclua mais detalhes, se quiser."
+        ></textarea>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="secondary-button" id="cancel-button" type="button">Cancelar</button>
+        <button class="primary-button" type="submit">Adicionar tarefa</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>

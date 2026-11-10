@@ -8,17 +8,74 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
+  <!-- Página inicial -->
+  <main class="auth-page" id="view-home">
+    <section class="auth-card home-card">
+      <p class="eyebrow">Organize seu trabalho</p>
+      <h1>Meu Kanban</h1>
+      <p class="subtitle">Acompanhe suas tarefas, uma etapa de cada vez.</p>
+
+      <div class="home-actions">
+        <a class="primary-button" href="#login" data-show="logged-out">Entrar</a>
+        <a class="primary-button" href="#quadro" data-show="logged-in" hidden>Abrir meu quadro</a>
+        <button class="secondary-button" type="button" data-logout data-show="logged-in" hidden>Sair</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login -->
+  <main class="auth-page" id="view-login" hidden>
+    <section class="auth-card" aria-labelledby="login-title">
+      <a class="back-link" href="#inicio">← Voltar à página inicial</a>
+
+      <p class="eyebrow">Meu Kanban</p>
+      <h2 id="login-title">Entrar</h2>
+      <p class="subtitle">Acesse sua conta para ver e organizar suas tarefas.</p>
+
+      <form id="login-form" novalidate>
+        <div class="form-field">
+          <label for="identifier">E-mail ou nome de usuário</label>
+          <input id="identifier" name="identifier" type="text" autocomplete="username"
+                 placeholder="Ex.: admin ou admin@meukanban.com" aria-describedby="identifier-error">
+          <p class="field-error" id="identifier-error" hidden></p>
+        </div>
+
+        <div class="form-field">
+          <label for="password">Senha</label>
+          <div class="password-wrapper">
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                   placeholder="Digite sua senha" aria-describedby="password-error">
+            <button class="toggle-password" id="toggle-password" type="button"
+                    aria-pressed="false" aria-controls="password">Mostrar</button>
+          </div>
+          <p class="field-error" id="password-error" hidden></p>
+        </div>
+
+        <p class="form-message" id="form-message" role="alert" hidden></p>
+
+        <button class="primary-button submit-button" id="submit-button" type="submit">Entrar</button>
+      </form>
+
+      <p class="demo-hint">Para testar: usuário <strong>admin</strong> e senha <strong>123456</strong>.</p>
+    </section>
+  </main>
+
+  <!-- Quadro Kanban (área restrita) -->
+  <main class="app" id="view-app" hidden>
     <header class="page-header">
       <div>
         <p class="eyebrow">Organize seu trabalho</p>
         <h1>Meu Kanban</h1>
         <p class="subtitle">Acompanhe suas tarefas, uma etapa de cada vez.</p>
       </div>
-      <button class="primary-button" id="add-task-button" type="button">
-        <span class="add-icon" aria-hidden="true">+</span>
-        Adicionar nova tarefa
-      </button>
+      <div class="header-actions">
+        <a class="secondary-button" href="#inicio">Página inicial</a>
+        <button class="secondary-button" type="button" data-logout>Sair</button>
+        <button class="primary-button" id="add-task-button" type="button">
+          <span class="add-icon" aria-hidden="true">+</span>
+          Adicionar nova tarefa
+        </button>
+      </div>
     </header>
 
     <p class="storage-notice" id="storage-notice" role="status" hidden>

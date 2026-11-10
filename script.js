@@ -1,3 +1,194 @@
+/*
+ * Meu Kanban — login (demonstração, somente front-end) + quadro de tarefas.
+ * Credenciais de teste:  admin  (ou admin@meukanban.com)  /  123456
+ * ATENÇÃO: sem servidor, os dados de acesso ficam visíveis no navegador.
+ * Para uso real, a validação deve ser feita em um back-end.
+ */
+
+/* ============ 1. Autenticação ============ */
+const Auth = (() => {
+  "use strict";
+
+  const SESSION_KEY = "meu-kanban-sessao";
+  const USERS = [
+    { username: "admin", email: "admin@meukanban.com", password: "123456", name: "Administrador" }
+  ];
+
+  function isLoggedIn() {
+    try {
+      return sessionStorage.getItem(SESSION_KEY) !== null;
+    } catch {
+      return false;
+    }
+  }
+
+  function login(identifier, password) {
+    const id = identifier.trim().toLowerCase();
+    const user = USERS.find(
+      (u) => (u.username === id || u.email === id) && u.password === password
+    );
+    if (!user) return { ok: false, reason: "invalid" };
+
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user: user.username, name: user.name }));
+      return { ok: true };
+    } catch {
+      return { ok: false, reason: "storage" };
+    }
+  }
+
+  function logout() {
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch {
+      /* sem armazenamento, nada a limpar */
+    }
+  }
+
+  return { isLoggedIn, login, logout };
+})();
+
+/* ============ 2. Navegação entre telas + login ============ */
+(() => {
+  "use strict";
+
+  const views = {
+    inicio: { id: "view-home", title: "Meu Kanban" },
+    login: { id: "view-login", title: "Entrar — Meu Kanban" },
+    quadro: { id: "view-app", title: "Meu quadro — Meu Kanban" }
+  };
+
+  const form = document.querySelector("#login-form");
+  const identifierInput = document.querySelector("#identifier");
+  const passwordInput = document.querySelector("#password");
+  const toggleButton = document.querySelector("#toggle-password");
+  const submitButton = document.querySelector("#submit-button");
+  const formMessage = document.querySelector("#form-message");
+
+  function route() {
+    let name = location.hash.slice(1);
+    if (!views[name]) name = "inicio";
+    const logged = Auth.isLoggedIn();
+
+    // Área restrita só para quem está autenticado (RF08)
+    if (name === "quadro" && !logged) {
+      location.replace("#login");
+      return;
+    }
+    if (name === "login" && logged) {
+      location.replace("#quadro");
+      return;
+    }
+
+    for (const [key, view] of Object.entries(views)) {
+      document.getElementById(view.id).hidden = key !== name;
+    }
+
+    document.querySelectorAll("[data-show]").forEach((el) => {
+      el.hidden = (el.dataset.show === "logged-in") !== logged;
+    });
+
+    document.title = views[name].title;
+    if (name === "login") resetLoginForm();
+    window.scrollTo(0, 0);
+  }
+
+  // Sair da conta (RF09)
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("[data-logout]")) return;
+    Auth.logout();
+    location.hash = "login";
+    route();
+  });
+
+  /* ----- Login ----- */
+  function setFieldError(input, message) {
+    const error = document.querySelector(`#${input.id}-error`);
+    error.textContent = message;
+    error.hidden = !message;
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+  }
+
+  function showMessage(text, type) {
+    formMessage.textContent = text;
+    formMessage.className = `form-message is-${type}`;
+    formMessage.hidden = false;
+  }
+
+  function clearMessage() {
+    formMessage.hidden = true;
+    formMessage.textContent = "";
+  }
+
+  function resetLoginForm() {
+    form.reset();
+    setFieldError(identifierInput, "");
+    setFieldError(passwordInput, "");
+    clearMessage();
+    passwordInput.type = "password";
+    toggleButton.textContent = "Mostrar";
+    toggleButton.setAttribute("aria-pressed", "false");
+    submitButton.disabled = false;
+  }
+
+  // Mostrar / ocultar senha (RF07)
+  toggleButton.addEventListener("click", () => {
+    const show = passwordInput.type === "password";
+    passwordInput.type = show ? "text" : "password";
+    toggleButton.textContent = show ? "Ocultar" : "Mostrar";
+    toggleButton.setAttribute("aria-pressed", String(show));
+    passwordInput.focus();
+  });
+
+  identifierInput.addEventListener("input", () => {
+    setFieldError(identifierInput, "");
+    clearMessage();
+  });
+
+  passwordInput.addEventListener("input", () => {
+    setFieldError(passwordInput, "");
+    clearMessage();
+  });
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    clearMessage();
+
+    const identifier = identifierInput.value.trim();
+    const password = passwordInput.value;
+
+    // Validação dos campos obrigatórios (RF05)
+    setFieldError(identifierInput, identifier ? "" : "Informe seu e-mail ou nome de usuário.");
+    setFieldError(passwordInput, password ? "" : "Informe sua senha.");
+
+    if (!identifier) return identifierInput.focus();
+    if (!password) return passwordInput.focus();
+
+    // Autenticação (RF04, RF06)
+    const result = Auth.login(identifier, password);
+
+    if (!result.ok) {
+      const text = result.reason === "storage"
+        ? "Não foi possível iniciar a sessão. Verifique se o navegador permite armazenamento e tente novamente."
+        : "E-mail, usuário ou senha incorretos. Confira os dados e tente novamente.";
+      showMessage(text, "error");
+      passwordInput.select();
+      return;
+    }
+
+    showMessage("Login realizado com sucesso! Redirecionando...", "success");
+    submitButton.disabled = true;
+    setTimeout(() => {
+      location.hash = "quadro";
+      route();
+    }, 600);
+  });
+
+  window.addEventListener("hashchange", route);
+  route();
+})();
+
+/* ============ 3. Quadro Kanban ============ */
 (() => {
   "use strict";
 
